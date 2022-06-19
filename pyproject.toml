@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "tweets-nlu-exploration"
+version = "0.1.0"
+description = "Apply NLU methods on tweet data."
+authors = ["Armand Silviu Gurgu <armandgurgu23@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+hydra-core = "^1.2.0"
+Cython = "^0.29.30"
+pybind11 = "^2.9.2"
+pythran = "^0.11.0"
+numpy = "1.19"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
