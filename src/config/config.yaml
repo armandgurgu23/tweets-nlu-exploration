@@ -1,0 +1,3 @@
+defaults:
+  - save: temp
+main_operation_mode: train

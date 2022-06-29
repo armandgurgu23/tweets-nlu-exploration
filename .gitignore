@@ -1,1 +1,4 @@
 mlruns
+outputs
+multirun
+__pycache__
