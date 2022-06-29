@@ -5,12 +5,11 @@ description = "Apply NLU methods on tweet data."
 authors = ["Armand Silviu Gurgu <armandgurgu23@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.8"
 hydra-core = "^1.2.0"
 Cython = "^0.29.30"
 pybind11 = "^2.9.2"
 pythran = "^0.11.0"
-numpy = "1.19"
 
 [tool.poetry.dev-dependencies]
 
