@@ -1,3 +1,4 @@
 defaults:
   - save: temp
+  - data: data_processing
 main_operation_mode: train
