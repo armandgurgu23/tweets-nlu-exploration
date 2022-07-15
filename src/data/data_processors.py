@@ -8,7 +8,7 @@ import logging
 log = logging.getLogger(__name__)
 
 
-def remove_non_english_examples(dataset: pd.DataFrame, filtering_config: DictConfig):
+def remove_non_english_examples(dataset: pd.DataFrame, filtering_config: DictConfig) -> pd.DataFrame:
     fasttext_model = load_model(filtering_config.model_path)
     fasttext_preds = dataset['content_cleaned'].apply(
         lambda content: get_fasttext_prediction(content, fasttext_model, filtering_config.confidence))
@@ -34,13 +34,13 @@ def get_fasttext_prediction(input_text: str, fasttext_model: FastText._FastText,
         return 'not-confident', 0.0
 
 
-def remove_hashtag_labels_from_tweets(dataset: pd.DataFrame):
+def remove_hashtag_labels_from_tweets(dataset: pd.DataFrame) -> pd.DataFrame:
     dataset['content_cleaned'] = dataset.apply(
         lambda row: remove_hashtag_label_from_single_tweet(row), axis=1)
     return dataset
 
 
-def remove_hashtag_label_from_single_tweet(row: pd.DataFrame):
+def remove_hashtag_label_from_single_tweet(row: pd.DataFrame) -> str:
     hashtag_in_query = row['query'].split()[0]
     cleaned_content = row['content'].replace(hashtag_in_query, '')
     cleaned_content = cleaned_content.replace(
@@ -51,8 +51,15 @@ def remove_hashtag_label_from_single_tweet(row: pd.DataFrame):
     return cleaned_content.strip()
 
 
+def create_topic_classes_column(dataset: pd.DataFrame) -> pd.DataFrame:
+    dataset['label'] = dataset['query'].apply(
+        lambda query: query.split()[0][1:])
+    return dataset
+
+
 def process_dataset(dataset: pd.DataFrame, filtering_config: DictConfig) -> pd.DataFrame:
     dataset = remove_hashtag_labels_from_tweets(dataset)
+    dataset = create_topic_classes_column(dataset)
     if filtering_config.apply_english_filtering:
         log.info(f'Filtering non-English tweets using FastText model!')
         dataset = remove_non_english_examples(dataset, filtering_config)
