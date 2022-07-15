@@ -11,4 +11,6 @@ def main_data_processing(cfg: DictConfig):
     dataset = get_dataset(cfg.data.data_path, cfg.data.pandas_read_csv_config)
     processed_dataset = process_dataset(
         dataset, cfg.data.data_processing_config)
+    # Add code to split datasets into train-valid-test splits
+    # and to write them to disk here.
     return

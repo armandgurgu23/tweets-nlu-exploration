@@ -1,4 +1,5 @@
 defaults:
   - save: temp
   - data: data_processing
+seed: 42
 main_operation_mode: data_processing
