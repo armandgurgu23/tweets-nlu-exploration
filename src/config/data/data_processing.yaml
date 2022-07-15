@@ -2,6 +2,10 @@ data_path:  "${oc.env:HOME}/Documents/side_projects/tweets-nlu-exploration/data/
 pandas_read_csv_config:
   sep: "\t"
   iterator: false
+pandas_to_csv_config:
+  date_format: '%Y:%m:%d-%H:%M:%S'
+  header: True
+  index: False
 data_processing_config:
   apply_english_filtering: True
   model_path:  "${oc.env:HOME}/Documents/side_projects/tweets-nlu-exploration/models/lid.176.bin"

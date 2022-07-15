@@ -1,7 +1,4 @@
 from typing import Dict
-import sklearn
-
-
 from sklearn.model_selection import train_test_split
 import pandas as pd
 from omegaconf import DictConfig
@@ -25,5 +22,11 @@ def split_dataset_into_ml_datasets(dataset: pd.DataFrame, seed: int, data_split_
     }
 
 
-def write_ml_datasets_to_disk(ml_datasets: Dict[str, pd.DataFrame]) -> None:
-    pass
+def write_ml_datasets_to_disk(ml_datasets: Dict[str, pd.DataFrame], dataset_path: str, write_config: DictConfig) -> None:
+    dataset_filename, dataset_ext = dataset_path.split(
+        '/')[-1].split('.')[0], dataset_path.split('/')[-1].split('.')[1]
+    for dataset_type in ml_datasets:
+        curr_dataset = ml_datasets[dataset_type]
+        output_name = f"{dataset_filename}_processed_{dataset_type}.{dataset_ext}"
+        curr_dataset.to_csv(path_or_buf=output_name, **write_config)
+    return
