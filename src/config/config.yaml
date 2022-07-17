@@ -1,5 +1,7 @@
 defaults:
   - save: temp
   - data: data_processing
+  - experiment: baseline_model
+  - _self_
 seed: 42
-main_operation_mode: data_processing
+main_operation_mode: experiment
