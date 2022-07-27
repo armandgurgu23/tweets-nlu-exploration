@@ -1,0 +1,7 @@
+model_type: sklearn
+trainer_type: sklearn
+evaluate_on_test_data: false
+data:
+  train:
+  valid:
+  test:
