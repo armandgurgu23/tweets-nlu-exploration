@@ -43,6 +43,7 @@ class SklearnTrainer(BaseTrainer):
         return read_csv(dataset_path, **reader_config)
 
     def train_model(self):
+        print(self.model_to_train.__dict__.keys())
         raise NotImplementedError(
             'Implement logic for training sklearn model!')
 

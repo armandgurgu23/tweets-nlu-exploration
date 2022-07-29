@@ -18,4 +18,16 @@ data:
       iterator: true
       chunksize: 20
 model:
-  sample_field: 5
+  use_sgd_architecture: true
+  architecture_config:
+    loss: "log_loss"
+  vectorizer:
+    name: 'hashing'
+    config:
+      analyzer: 'word'
+      lowercase: true
+
+
+
+
+

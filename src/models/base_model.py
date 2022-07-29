@@ -1,5 +1,8 @@
 from abc import ABC, abstractmethod
 from omegaconf import DictConfig
+from sklearn.linear_model import SGDClassifier
+from sklearn.feature_extraction.text import HashingVectorizer
+from typing import Any
 
 
 class MLModel(ABC):
@@ -7,9 +10,15 @@ class MLModel(ABC):
     def __init__(self, model_config: DictConfig) -> None:
         self.config = model_config
         self.model = self.initialize_model(self.config)
+        self.vectorizer = self.initialize_data_vectorizer(
+            self.config.vectorizer)
 
     @abstractmethod
     def initialize_model(self, model_config: DictConfig) -> "MLModel":
+        pass
+
+    @abstractmethod
+    def initialize_data_vectorizer(self, vectorizer_config: DictConfig) -> Any:
         pass
 
     @abstractmethod
@@ -33,11 +42,23 @@ class MLModel(ABC):
         pass
 
 
+sklearn_vectorizers = {
+    'hashing': HashingVectorizer
+}
+
+
 class SklearnModel(MLModel):
 
     def initialize_model(self, model_config: DictConfig) -> "MLModel":
-        print(model_config)
-        raise NotImplementedError('Fill logic for sklearn.initialize_model!')
+        if model_config.use_sgd_architecture:
+            return SGDClassifier(**model_config.architecture_config)
+        else:
+            raise NotImplementedError(
+                f'So far only minibatch training supported for sklearn model!')
+
+    def initialize_data_vectorizer(self, vectorizer_config: DictConfig) -> HashingVectorizer:
+        vectorizer = sklearn_vectorizers[vectorizer_config.name]
+        return vectorizer(**vectorizer_config.config)
 
     def save_model(self, output_path: str) -> None:
         raise NotImplementedError('Fill logic for sklearn.save_model!')
