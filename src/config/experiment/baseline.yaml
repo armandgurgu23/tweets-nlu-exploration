@@ -26,6 +26,10 @@ model:
     config:
       analyzer: 'word'
       lowercase: true
+trainer:
+  num_epochs: 20
+  save_model_per_updates: 50000
+
 
 
 

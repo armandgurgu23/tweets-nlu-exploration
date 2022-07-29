@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Any, List
 from omegaconf import DictConfig
 from models import models_registry
 from pandas import read_csv
@@ -42,10 +43,28 @@ class SklearnTrainer(BaseTrainer):
     def initialize_dataset_loader(self, dataset_path: str, reader_config: DictConfig):
         return read_csv(dataset_path, **reader_config)
 
+    def get_all_labels_in_dataset(self, train_loader: Any) -> List[str]:
+        all_labels_in_dataset = []
+        for pd_batch in train_loader:
+            all_labels_in_dataset += pd_batch['label'].tolist()
+        return sorted(set(all_labels_in_dataset))
+
     def train_model(self):
-        print(self.model_to_train.__dict__.keys())
-        raise NotImplementedError(
-            'Implement logic for training sklearn model!')
+        minibatch_count = 0
+        unique_labels = self.get_all_labels_in_dataset(self.train_loader)
+        for current_epoch in range(self.config.trainer.num_epochs):
+            self.train_loader = self.initialize_dataset_loader(
+                self.config.data.train.filepath, self.config.data.train.reader_config)
+            self.valid_loader = self.initialize_dataset_loader(
+                self.config.data.valid.filepath, self.config.data.valid.reader_config)
+            for pd_batch in self.train_loader:
+                text_batch, labels_batch = pd_batch['content_cleaned'].tolist(
+                ), pd_batch['label'].tolist()
+                self.model_to_train.run_training_step(
+                    text_batch, labels_batch, unique_labels=unique_labels)
+                minibatch_count += 1
+                print('Finished fitting a minibatch!')
+        return
 
     def evaluate_model(self):
         raise NotImplementedError(
