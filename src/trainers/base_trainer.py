@@ -76,6 +76,10 @@ class SklearnTrainer(BaseTrainer):
                 if minibatch_count % self.config.trainer.save_model_per_updates == 0:
                     self.model_to_train.save_model(
                         output_path=f"ckpt_{minibatch_count}")
+            valid_metrics = self.model_to_train.run_validation_epoch(
+                self.valid_loader, self.config.data.valid.metrics_config, unique_labels=unique_labels)
+            log.info(
+                f"Validation metrics (epoch {current_epoch+1}/{self.config.trainer.num_epochs}): {valid_metrics}")
         log.info('Finished training model! Storing final model!')
         self.model_to_train.save_model(
             output_path=f"final_model_ckpt")

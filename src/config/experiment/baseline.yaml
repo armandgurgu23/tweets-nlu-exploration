@@ -6,17 +6,21 @@ data:
     filepath: "${oc.env:HOME}/Documents/side_projects/tweets-nlu-exploration/src/outputs/data_processing/2022-07-15_17-11-21/twitter_search_datadump_2022-07-14_00-19-28_processed_train.csv"
     reader_config:
       iterator: true
-      chunksize: 20
+      chunksize: 360
   valid:
     filepath: "${oc.env:HOME}/Documents/side_projects/tweets-nlu-exploration/src/outputs/data_processing/2022-07-15_17-11-21/twitter_search_datadump_2022-07-14_00-19-28_processed_valid.csv"
     reader_config:
       iterator: true
-      chunksize: 20
+      chunksize: 360
+    metrics_config:
+      average: 'micro'
   test:
     filepath: "${oc.env:HOME}/Documents/side_projects/tweets-nlu-exploration/src/outputs/data_processing/2022-07-15_17-11-21/twitter_search_datadump_2022-07-14_00-19-28_processed_test.csv"
     reader_config:
       iterator: true
       chunksize: 20
+    metrics_config:
+      average: 'micro'
 model:
   use_sgd_architecture: true
   architecture_config:
@@ -27,8 +31,8 @@ model:
       analyzer: 'word'
       lowercase: true
 trainer:
-  num_epochs: 20
-  save_model_per_updates: 100
+  num_epochs: 3
+  save_model_per_updates: 120
   log_train_loss_per_updates: 20
 
 

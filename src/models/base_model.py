@@ -7,6 +7,8 @@ from typing import Any, Dict, List
 from os import makedirs, path
 from joblib import dump as jl_dump
 from joblib import load as jl_load
+from numpy import argmax, mean
+from sklearn.metrics import precision_score, recall_score, accuracy_score
 
 
 class MLModel(ABC):
@@ -38,7 +40,7 @@ class MLModel(ABC):
         pass
 
     @abstractmethod
-    def run_validation_step(self):
+    def run_validation_epoch(self, validation_reader: Any):
         pass
 
     @abstractmethod
@@ -86,9 +88,31 @@ class SklearnModel(MLModel):
             range(len(kwargs['unique_labels']))))
         return train_loss
 
-    def run_validation_step(self):
-        raise NotImplementedError(
-            'Fill logic for sklearn.run_validation_step!')
+    def run_validation_epoch(self, validation_reader: Any, metrics_config: Dict, **kwargs: Dict):
+        validation_losses = []
+        all_preds = []
+        all_gt = []
+        for pd_batch in validation_reader:
+            text_batch, labels_batch = pd_batch['content_cleaned'].tolist(
+            ), pd_batch['label'].tolist()
+            text_vectors = self.vectorizer.fit_transform(text_batch)
+            label_vectors = self.encode_labels_to_vectors(
+                labels_batch, kwargs['unique_labels'])
+            prediction_vectors = self.model.predict_proba(
+                text_vectors)
+            prediction_indexes = argmax(prediction_vectors, axis=-1).tolist()
+            curr_valid_loss = log_loss(y_true=label_vectors, y_pred=prediction_vectors, labels=list(
+                range(len(kwargs['unique_labels']))))
+            validation_losses.append(curr_valid_loss)
+            all_preds += prediction_indexes
+            all_gt += label_vectors
+        validation_metrics = {
+            'valid_precision': precision_score(y_true=all_gt, y_pred=all_preds, **metrics_config),
+            'valid_recall': recall_score(y_true=all_gt, y_pred=all_preds, **metrics_config),
+            'valid_accuracy': accuracy_score(y_true=all_gt, y_pred=all_preds),
+            'valid_loss': mean(validation_losses)
+        }
+        return validation_metrics
 
     def forward_pass(self):
         raise NotImplementedError('Fill logic for sklearn.forward_pass!')
