@@ -5,6 +5,7 @@ from models import models_registry
 from pandas import read_csv
 from numpy import mean as np_mean
 import logging
+from experiment_trackers.mlflow_tracker import MLflowTracker
 
 log = logging.getLogger(__name__)
 
@@ -20,6 +21,8 @@ class BaseTrainer(ABC):
         if self.config.evaluate_on_test_data:
             self.test_loader = self.initialize_dataset_loader(
                 self.config.data.test.filepath, self.config.data.test.reader_config)
+        if self.config.enable_mlflow_tracking:
+            self.exp_tracker = MLflowTracker(self.config.experiment_tracking)
         self.model_to_train = models_registry[self.config.model_type](
             model_config=self.config.model)
 
