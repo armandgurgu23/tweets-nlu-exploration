@@ -3,6 +3,10 @@ from typing import Any, List
 from omegaconf import DictConfig
 from models import models_registry
 from pandas import read_csv
+from numpy import mean as np_mean
+import logging
+
+log = logging.getLogger(__name__)
 
 
 class BaseTrainer(ABC):
@@ -52,6 +56,7 @@ class SklearnTrainer(BaseTrainer):
     def train_model(self):
         minibatch_count = 0
         unique_labels = self.get_all_labels_in_dataset(self.train_loader)
+        training_losses = []
         for current_epoch in range(self.config.trainer.num_epochs):
             self.train_loader = self.initialize_dataset_loader(
                 self.config.data.train.filepath, self.config.data.train.reader_config)
@@ -60,12 +65,19 @@ class SklearnTrainer(BaseTrainer):
             for pd_batch in self.train_loader:
                 text_batch, labels_batch = pd_batch['content_cleaned'].tolist(
                 ), pd_batch['label'].tolist()
-                self.model_to_train.run_training_step(
+                curr_train_loss = self.model_to_train.run_training_step(
                     text_batch, labels_batch, unique_labels=unique_labels)
+                training_losses.append(curr_train_loss)
                 minibatch_count += 1
-                print('Finished fitting a minibatch!')
+                if minibatch_count % self.config.trainer.log_train_loss_per_updates == 0:
+                    log.info(
+                        f'Current train loss (epoch {current_epoch+1}/{self.config.trainer.num_epochs}): {np_mean(training_losses)}')
+                    training_losses = []
+                if minibatch_count % self.config.trainer.save_model_per_updates == 0:
+                    self.model_to_train.save_model(
+                        output_path=f"ckpt_{minibatch_count}")
         return
 
     def evaluate_model(self):
         raise NotImplementedError(
-            'Start implementing sklearn evaluation method!')
+            'Start implementing sklearn evaluation method on test set!!')

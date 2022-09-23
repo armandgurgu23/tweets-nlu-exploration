@@ -4,6 +4,9 @@ from omegaconf import DictConfig
 from sklearn.linear_model import SGDClassifier
 from sklearn.feature_extraction.text import HashingVectorizer
 from typing import Any, Dict, List
+from os import makedirs, path
+from joblib import dump as jl_dump
+from joblib import load as jl_load
 
 
 class MLModel(ABC):
@@ -62,10 +65,12 @@ class SklearnModel(MLModel):
         return vectorizer(**vectorizer_config.config)
 
     def save_model(self, output_path: str) -> None:
-        raise NotImplementedError('Fill logic for sklearn.save_model!')
+        makedirs(output_path, exist_ok=True)
+        jl_dump(self.model, path.join(output_path, 'model.joblib'))
+        return
 
     def load_model(self, load_path: str) -> "MLModel":
-        raise NotImplementedError('Fill logic for sklearn.load_model!')
+        return jl_load(load_path)
 
     def encode_labels_to_vectors(self, label_batch: Any, all_labels: List[str]):
         return [all_labels.index(current_label) for current_label in label_batch]

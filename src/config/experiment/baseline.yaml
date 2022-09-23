@@ -28,7 +28,8 @@ model:
       lowercase: true
 trainer:
   num_epochs: 20
-  save_model_per_updates: 50000
+  save_model_per_updates: 100
+  log_train_loss_per_updates: 20
 
 
 
